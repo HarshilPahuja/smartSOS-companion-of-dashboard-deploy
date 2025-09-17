@@ -32,7 +32,7 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "" }) => 
                 lat: latitude.toString(),
                 lang: longitude.toString(),
                 radius: 1,
-                message: "bkl harshil"
+                message: "Urgent Assistence Required."
               };
 
               fetch("http://localhost:4001/api/add-demo", {

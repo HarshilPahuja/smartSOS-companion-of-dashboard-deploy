@@ -58,7 +58,7 @@ const Map = ({ className = '' }) => {
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Leaflet Map */}
-      <div className="w-full h-96 rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full rounded-lg shadow-lg overflow-hidden h-96 sm:h-[60vh]">
         <MapContainer
           center={[center.lat, center.lng]}
           zoom={13}
