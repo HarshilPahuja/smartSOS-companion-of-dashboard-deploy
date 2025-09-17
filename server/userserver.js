@@ -36,6 +36,27 @@ app.post("/api/add-demo", async (req, res) => {
   }
 });
 
+app.get('/api/danger-zones', async (req, res) => {
+  try {
+    // Fetch data from Supabase table
+    const { data, error } = await supabase
+      .from('danger_zones') // Replace with your actual table name
+      .select('id, lat, lang, radius, message');
+
+    if (error) {
+      console.error('❌ Supabase error:', error.message);
+      return res.status(500).json({ error: 'Failed to fetch danger zones' });
+    }
+
+    // Send JSON response to the frontend
+    res.status(200).json(data);
+  } catch (err) {
+    console.error('❌ Server error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 // ✅ Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
