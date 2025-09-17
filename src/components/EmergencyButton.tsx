@@ -5,9 +5,10 @@ import { Phone, MessageCircle } from 'lucide-react';
 
 interface EmergencyButtonProps {
   className?: string;
+  onSosSent?: () => void; // ✅ callback to notify parent (SOSScreen)
 }
 
-const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "" }) => {
+const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSosSent }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const { toast } = useToast();
@@ -32,7 +33,7 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "" }) => 
                 lat: latitude.toString(),
                 lang: longitude.toString(),
                 radius: 1,
-                message: "Urgent Assistence Required."
+                message: "SOS Trigger."
               };
 
               fetch("http://localhost:4001/api/add-demo", {
@@ -48,6 +49,9 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "" }) => 
                     description: `Location: ${latitude}, ${longitude}`,
                     variant: "destructive",
                   });
+
+                  // ✅ tell parent SOS was sent
+                  if (onSosSent) onSosSent();
                 })
                 .catch((err) => {
                   console.error("❌ Error inserting:", err);

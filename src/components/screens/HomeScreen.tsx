@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import SafetyLogo from '../SafetyLogo';
@@ -10,17 +10,78 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
-  const recentAlerts: Alert[] = [
-    {
-      id: '1',
-      type: 'warning',
-      title: 'Potential Danger Zone',
-      message: 'You are approaching an area with high reported accidents. Please be vigilant.',
-      location: 'Purvanchal',
-      time: '2 min ago',
-      actionRequired: true
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [zones, setZones] = useState([]);
+  const [inDangerZone, setInDangerZone] = useState(false);
+
+  // Watch user location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      const watcher = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (err) => console.error('Geolocation error:', err),
+        { enableHighAccuracy: true, maximumAge: 1000 }
+      );
+      return () => navigator.geolocation.clearWatch(watcher);
     }
-  ];
+  }, []);
+
+  // Fetch zones from backend
+  useEffect(() => {
+    const fetchZones = async () => {
+      try {
+        const res = await fetch('http://localhost:4001/api/danger-zones');
+        const data = await res.json();
+        const validZones = data.filter(
+          (zone) =>
+            zone.lat !== undefined &&
+            zone.lang !== undefined &&
+            !isNaN(zone.lat) &&
+            !isNaN(zone.lang)
+        );
+        setZones(validZones);
+      } catch (err) {
+        console.error('Error fetching zones:', err);
+      }
+    };
+
+    fetchZones();
+    const interval = setInterval(fetchZones, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Helper: check if user is inside a zone
+  const isInsideZone = (userLoc: { lat: number; lng: number }, zone: any) => {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const R = 6371000; // meters
+    const dLat = toRad(zone.lat - userLoc.lat);
+    const dLng = toRad(zone.lang - userLoc.lng);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(userLoc.lat)) *
+        Math.cos(toRad(zone.lat)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance <= (zone.radius || 200);
+  };
+
+  // Update danger zone state
+  useEffect(() => {
+    if (userLocation && zones.length > 0) {
+      const inside = zones.some((zone) => isInsideZone(userLocation, zone));
+      setInDangerZone(inside);
+    } else {
+      setInDangerZone(false);
+    }
+  }, [userLocation, zones]);
 
   const quickActions = [
     {
@@ -73,9 +134,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       {/* Live Safety Updates */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Live Safety Updates</h2>
-        {recentAlerts.map((alert) => (
-          <AlertCard key={alert.id} alert={alert} />
-        ))}
+        {inDangerZone && (
+          <AlertCard
+            alert={{
+              id: 'danger',
+              type: 'warning',
+              title: 'Potential Danger Zone',
+              message:
+                'You are approaching an area with high reported accidents. Please be vigilant.',
+              location: 'Current Area',
+              time: 'Just now',
+              actionRequired: true
+            }}
+          />
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -85,13 +157,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
-              <Card 
-                key={action.id} 
+              <Card
+                key={action.id}
                 className="p-4 cursor-pointer hover:shadow-elevated transition-shadow"
                 onClick={action.onClick}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`w-12 h-12 ${action.color} rounded-full flex items-center justify-center`}>
+                  <div
+                    className={`w-12 h-12 ${action.color} rounded-full flex items-center justify-center`}
+                  >
                     <Icon className={`w-6 h-6 ${action.textColor}`} />
                   </div>
                   <div>
