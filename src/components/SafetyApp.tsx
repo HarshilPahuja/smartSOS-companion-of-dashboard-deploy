@@ -34,7 +34,7 @@ const SafetyApp: React.FC = () => {
             </div>
             <Card className="p-6 text-center">
               <h3 className="font-medium mb-2">24/7 Emergency Helpline</h3>
-              <p className="text-2xl font-bold text-emergency mb-4">1-800-HELP-NOW</p>
+              <p className="text-2xl font-bold text-emergency mb-4">Call Emergency: 112</p>
               <p className="text-sm text-muted-foreground">
                 Our support team is available around the clock for any safety concerns.
               </p>
