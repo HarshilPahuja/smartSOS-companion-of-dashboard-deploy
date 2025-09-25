@@ -6,11 +6,12 @@ import AlertsScreen from './screens/AlertsScreen';
 import GeofenceScreen from './screens/GeofenceScreen';
 import { Card } from './ui/card';
 
-import Fire from './assets/Fire.svg';
-import Earthquake from './assets/Earthquake.svg';
-import Avalanche from './assets/Avalanche.svg';
-import Accident from './assets/Accident.svg';
-import Flood from './assets/Flood.svg';
+import Fire from './assets/fireb.svg';
+import Earthquake from './assets/earthquakeb.svg';
+import Avalanche from './assets/avalancheb.svg';
+import Accident from './assets/Accidentb.svg';
+import Flood from './assets/floodb.svg';
+import Other from './assets/+b.svg';
 
 
 const SafetyApp: React.FC = () => {
@@ -57,7 +58,7 @@ const SafetyApp: React.FC = () => {
     avalanche: <img src={Avalanche} alt="avalanche" className="w-8 h-8 text-black fill-current" />,
     accident: <img src={Accident} alt="accident" className="w-8 h-8 text-black fill-current" />,
     flood: <img src={Flood} alt="flood" className="w-8 h-8 text-black fill-current" />,
-    other: <img src={Flood} alt="other" className="w-8 h-8 text-black fill-current" />,
+    other: <img src={Other} alt="other" className="w-8 h-8 text-black fill-current" />,
   };
 
     const handleIssueSelect = (issueType: keyof typeof issueTemplates) => {

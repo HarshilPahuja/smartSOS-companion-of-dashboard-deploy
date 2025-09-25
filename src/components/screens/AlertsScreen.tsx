@@ -15,7 +15,7 @@ const AlertsScreen: React.FC<AlertsScreenProps> = ({ onNavigate }) => {
   const alerts: Alert[] = [
     {
       id: '1',
-      type: 'warning',
+      type: 'info',
       title: 'Potential Danger Zone',
       message: 'You are approaching an area with high reported accidents. Please be vigilant.',
       location: 'Purvanchal',
@@ -25,7 +25,7 @@ const AlertsScreen: React.FC<AlertsScreenProps> = ({ onNavigate }) => {
     {
       id: '2',
       title: 'Geofence Entry',
-      type: 'warning',
+      type: 'info',
       message: 'You have entered a monitored safety zone. Emergency services have been notified.',
       location: 'Safety Zone Alpha',
       time: '10:30 AM',

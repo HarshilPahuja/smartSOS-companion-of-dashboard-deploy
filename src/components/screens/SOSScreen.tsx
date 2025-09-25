@@ -83,16 +83,7 @@ const SOSScreen: React.FC<SOSScreenProps> = ({ onNavigate }) => {
         </Card>
       )}
 
-      {/* Back to Safety */}
-      <div className="text-center">
-        <Button 
-          variant="outline" 
-          onClick={() => onNavigate('home')}
-          className="px-8"
-        >
-          Back to Safety Dashboard
-        </Button>
-      </div>
+
     </div>
   );
 };

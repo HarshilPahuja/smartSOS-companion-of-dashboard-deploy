@@ -94,7 +94,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, onAction }) => {
               className={buttonClass}
               onClick={() => onAction?.(alert.id)}
             >
-              I understand the risks
+              <span className='text-black'>I understand the risks</span>
             </Button>
           )}
         </div>

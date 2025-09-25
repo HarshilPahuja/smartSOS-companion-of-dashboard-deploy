@@ -98,7 +98,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       title: 'Emergency Contacts',
       description: 'Call trusted contacts',
       icon: Phone,
-      color: 'bg-warning',
+      color: 'bg-safe',
       textColor: 'text-warning-foreground',
       onClick: () => onNavigate('contacts')
     },
@@ -116,7 +116,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       title: 'Community Alerts',
       description: 'View local safety updates',
       icon: Users,
-      color: 'bg-primary',
+      color: 'bg-safe',
       textColor: 'text-primary-foreground',
       onClick: () => onNavigate('alerts')
     }
@@ -184,7 +184,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <div className="flex items-center space-x-3">
           <div className="w-3 h-3 bg-safe rounded-full animate-pulse"></div>
           <div>
-            <p className="font-medium text-safe">System Status: Active</p>
+            <p className="font-medium text-safe">System Status: <span className='text-green-600'>Active</span></p>
             <p className="text-sm text-muted-foreground">All safety features are operational</p>
           </div>
         </div>

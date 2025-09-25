@@ -178,7 +178,7 @@ const GeofenceScreen: React.FC<GeofenceScreenProps> = ({ onNavigate }) => {
             </div>
           </div>
           <Button size="sm" className="bg-primary hover:bg-primary/90">
-            Enable
+            <span className='text-black'>Enable</span>
           </Button>
         </div>
       </Card>
