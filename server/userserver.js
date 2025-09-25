@@ -2,13 +2,15 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import { v4 as uuidv4 } from "uuid";
 import supabase from "./supabaseClient.js"; //  your client
 
 const app = express();
 const PORT = 4001;
 
 // Middleware
-app.use(cors({ origin: "http://localhost:8080" })); // your frontend port
+app.use(express.json({ limit: "10mb" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // POST route to insert into danger_zones
@@ -56,6 +58,58 @@ app.get('/api/danger-zones', async (req, res) => {
   }
 });
 
+// POST route to insert reports into crowdsource table
+app.post("/api/reports", async (req, res) => {
+  try {
+    const { lat, lang, dsc, img } = req.body;
+    let imgUrl = null;
+
+    if (img) {
+      const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+      const fileName = `reports/${uuidv4()}.png`;
+
+      // Upload image
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("reports")
+        .upload(fileName, buffer, { contentType: "image/png" });
+
+      if (uploadError) {
+        console.error("❌ Supabase Storage error:", uploadError.message);
+        return res.status(500).json({ error: uploadError.message });
+      }
+
+      console.log("✅ Uploaded image:", uploadData);
+
+      // Get public URL
+      const { data: publicUrlData, error: urlError } = supabase.storage
+        .from("reports")
+        .getPublicUrl(fileName);
+
+      if (urlError) {
+        console.error("❌ Supabase URL error:", urlError.message);
+        return res.status(500).json({ error: urlError.message });
+      }
+
+      imgUrl = publicUrlData.publicUrl; // <-- This is what goes into your table
+    }
+
+    // Insert into crowdsource table
+    const { data: insertData, error: insertError } = await supabase
+      .from("crowdsource")
+      .insert([{ lat, lang, dsc, img: imgUrl }]);
+
+    if (insertError) {
+      console.error("❌ Supabase insert error:", insertError.message);
+      return res.status(500).json({ error: insertError.message });
+    }
+
+    res.status(201).json({ success: true, data: insertData });
+  } catch (err) {
+    console.error("❌ Server error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ✅ Start server
 app.listen(PORT, () => {

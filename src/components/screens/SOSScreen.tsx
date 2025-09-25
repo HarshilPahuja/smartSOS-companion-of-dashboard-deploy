@@ -18,7 +18,7 @@ const SOSScreen: React.FC<SOSScreenProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPin className="w-4 h-4 mr-1" />
-            <span>Purvanchal</span>
+            <span>Pune</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <Clock className="w-4 h-4 mr-1" />

@@ -28,7 +28,7 @@ const Map = ({ className = '' }) => {
   useEffect(() => {
     const fetchZones = async () => {
       try {
-        const res = await fetch('http://localhost:4001/api/danger-zones');
+        const res = await fetch("http://localhost:4001/api/danger-zones");
         const data = await res.json();
 
         const validZones = data.filter(
@@ -66,7 +66,6 @@ const Map = ({ className = '' }) => {
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
           />
 
           {/* Red circles for all zones */}

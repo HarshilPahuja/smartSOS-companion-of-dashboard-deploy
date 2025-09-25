@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Phone, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Phone, MessageCircle } from "lucide-react";
 
 interface EmergencyButtonProps {
   className?: string;
-  onSosSent?: () => void; // ✅ callback to notify parent (SOSScreen)
+  onSosSent?: () => void;
 }
 
 const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSosSent }) => {
@@ -14,6 +14,7 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSos
   const { toast } = useToast();
 
   const handleEmergencyPress = () => {
+    if (isPressed) return; // prevent multiple triggers
     setIsPressed(true);
     setCountdown(3);
 
@@ -23,38 +24,32 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSos
           clearInterval(countdownInterval);
           setIsPressed(false);
 
-          // ✅ Get user location and send POST request
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const { latitude, longitude } = position.coords;
-
               const dangerZone = {
-                // remove id → backend auto-generates
                 lat: latitude.toString(),
                 lang: longitude.toString(),
                 radius: 1,
-                message: "SOS Trigger."
+                message: "Help."
               };
 
-              fetch("http://localhost:4001/api/add-demo", {
+            fetch("http://localhost:4001/api/add-demo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dangerZone),
               })
                 .then((res) => res.json())
                 .then((data) => {
-                  console.log("✅ Inserted into Supabase:", data);
                   toast({
                     title: "Emergency Alert Sent!",
                     description: `Location: ${latitude}, ${longitude}`,
                     variant: "destructive",
                   });
-
-                  // ✅ tell parent SOS was sent
                   if (onSosSent) onSosSent();
                 })
                 .catch((err) => {
-                  console.error("❌ Error inserting:", err);
+                  console.error(err);
                   toast({
                     title: "Failed to send alert",
                     description: "Please try again.",
@@ -63,7 +58,6 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSos
                 });
             },
             (error) => {
-              console.error("❌ Location error:", error);
               toast({
                 title: "Location Access Denied",
                 description: "Please enable GPS to send alert.",
@@ -89,6 +83,70 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSos
     });
   };
 
+  // ===== Motion Detection =====
+useEffect(() => {
+  const SHAKE_THRESHOLD = 25; // adjust sensitivity
+  let lastShakeTime = 0;
+  const COOLDOWN = 5000; // 5 seconds
+
+  let lastTime = 0;
+  let lastX: number | null = null;
+  let lastY: number | null = null;
+  let lastZ: number | null = null;
+
+  const handleMotion = (event: DeviceMotionEvent) => {
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
+
+    const { x, y, z } = acc;
+    const currentTime = Date.now();
+
+    if (lastX !== null && lastY !== null && lastZ !== null) {
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime > 150) { // sample every 150ms
+        const deltaX = Math.abs(lastX - x!);
+        const deltaY = Math.abs(lastY - y!);
+        const deltaZ = Math.abs(lastZ - z!);
+
+        // ✅ Replace old detection with cooldown logic
+        if (deltaX + deltaY + deltaZ > SHAKE_THRESHOLD) {
+          if (currentTime - lastShakeTime > COOLDOWN) {
+            handleEmergencyPress(); // trigger SOS
+            lastShakeTime = currentTime;
+          }
+        }
+
+        lastTime = currentTime;
+        lastX = x!;
+        lastY = y!;
+        lastZ = z!;
+      }
+    } else {
+      lastX = x!;
+      lastY = y!;
+      lastZ = z!;
+      lastTime = currentTime;
+    }
+  };
+
+  // request permission if needed (iOS)
+  const requestMotionPermission = async () => {
+    if (typeof (DeviceMotionEvent as any)?.requestPermission === "function") {
+      const response = await (DeviceMotionEvent as any).requestPermission();
+      if (response !== "granted") return;
+    }
+    window.addEventListener("devicemotion", handleMotion);
+  };
+
+  requestMotionPermission();
+
+  return () => {
+    window.removeEventListener("devicemotion", handleMotion);
+  };
+}, []);
+
+
+  // ===== UI =====
   if (isPressed && countdown > 0) {
     return (
       <div className={`flex flex-col items-center space-y-6 ${className}`}>

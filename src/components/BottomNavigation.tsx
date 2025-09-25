@@ -13,7 +13,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab, onTabCha
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
     { id: 'sos', label: 'SOS', icon: null }, // Special SOS button
     { id: 'maps', label: 'Maps', icon: Map },
-    { id: 'support', label: 'Support', icon: Headphones },
+    { id: 'support', label: 'Report', icon: Headphones },
   ];
 
   return (
