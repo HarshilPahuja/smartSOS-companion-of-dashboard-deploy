@@ -95,7 +95,7 @@ const SafetyApp: React.FC = () => {
 
           console.log("Report data to send:", reportObj);
 
-          fetch('http://localhost:4001/api/reports', {
+          fetch('https://smartsos-kyfz.onrender.com/api/reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reportObj)

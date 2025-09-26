@@ -34,7 +34,7 @@ const GeofenceScreen: React.FC<GeofenceScreenProps> = ({ onNavigate }) => {
   useEffect(() => {
     const fetchZones = async () => {
       try {
-        const res = await fetch('http://localhost:4001/api/danger-zones');
+        const res = await fetch('https://smartsos-kyfz.onrender.com/api/danger-zones');
         const data = await res.json();
         const validZones = data.filter(
           (zone) =>

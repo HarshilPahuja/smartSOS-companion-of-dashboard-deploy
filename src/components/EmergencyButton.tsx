@@ -34,7 +34,7 @@ const EmergencyButton: React.FC<EmergencyButtonProps> = ({ className = "", onSos
                 message: "Help."
               };
 
-            fetch("http://localhost:4001/api/add-demo", {
+            fetch("https://smartsos-kyfz.onrender.com/api/add-demo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dangerZone),

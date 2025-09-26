@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import supabase from "./supabaseClient.js"; //  your client
 
 const app = express();
-const PORT = 4001;
+const PORT = process.env.PORT || 4001;
 
 // Middleware
 app.use(express.json({ limit: "10mb" }));
